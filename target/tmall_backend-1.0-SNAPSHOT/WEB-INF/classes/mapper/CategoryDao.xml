@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.abelib.tmall.dao.CategoryDao">
+    <resultMap id="categoryMap" type="Category">
+        <id property="id" column="id"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="note" column="note"/>
+    </resultMap>
+    <cache/>
+
+    <select id="countCategory" resultType="int">
+        select count(*) from category
+    </select>
+    <!--遍历整个 category 表-->
+    <select id="listAllCategory" resultMap="categoryMap">
+        select * from category
+        <if test="start !=null and count != null">
+            limit #{start}, #{count}
+        </if>
+    </select>
+
+    <!--通过id获取 Category-->
+    <select id="getCategoryById" parameterType="int" resultMap="categoryMap">
+        select * from category
+        where id = #{id}
+    </select>
+
+    <!--插入，并且主键回填-->
+    <insert id="insertCategory"  parameterType="Category"
+            useGeneratedKeys="true"  keyProperty="id">
+        insert into category(category_name, note) values(#{categoryName}, #{note})
+    </insert>
+
+    <!--删除 Category-->
+    <delete id="deleteCategory" parameterType="int">
+        delete from category where id = #{id}
+    </delete>
+
+    <!--更新 Category-->
+    <update id="updateCategory" parameterType="Category">
+        update category
+        <set>
+            <if test="note != null and note != ''">
+                note = #{note},
+            </if>
+            <if test="categoryName != null and categoryName != ''">
+                category_name = #{categoryName}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>

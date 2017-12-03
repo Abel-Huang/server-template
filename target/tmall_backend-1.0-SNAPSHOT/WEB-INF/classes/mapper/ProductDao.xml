@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.abelib.tmall.dao.ProductDao">
+    <resultMap id="productMap" type="Product">
+        <id property="id" column="id"/>
+        <result property="productName" column="product_name"/>
+        <result property="subTitle" column="sub_title"/>
+        <result property="originalPrice" column="original_price"/>
+        <result property="promotePrice" column="promote_price"/>
+        <result property="stock" column="stock"/>
+        <result property="categoryId" column="cid"/>
+        <result property="createDate" column="create_date"/>
+    </resultMap>
+    <cache/>
+
+    <!--遍历整个 Product 表-->
+    <select id="listAllProduct" parameterType="int" resultMap="productMap">
+        select * from product
+        <where>
+            <if test="_parameter != null ">
+                cid = #{_parameter}
+            </if>
+        </where>
+    </select>
+
+    <!--通过id获取 Product-->
+    <select id="getProductById" parameterType="int" resultMap="productMap">
+        select * from product
+        where id = #{id}
+    </select>
+
+    <!--插入，并且主键回填-->
+    <insert id="insertProduct"  parameterType="Product"
+            useGeneratedKeys="true"  keyProperty="id">
+        insert into product(product_name, sub_title, original_price, promote_price, stock, cid, create_date)
+        values(#{productName}, #{subTitle}, #{originalPrice}, #{promotePrice}, #{stock}, #{categoryId}, #{createDate})
+    </insert>
+
+    <!--删除 Product-->
+    <delete id="deleteProduct" parameterType="int">
+        delete from product where id = #{id}
+    </delete>
+
+    <!--更新 Product-->
+    <update id="updateProduct" parameterType="Product">
+        update product
+        <set>
+            <if test="productName != null and productName != ''">
+                product_name = #{productName},
+            </if>
+            <if test="subTitle != null and subTitle != ''">
+                sub_title = #{subTitle},
+            </if>
+            <if test="originalPrice != null ">
+                original_price = #{originalPrice},
+            </if>
+            <if test="promotePrice != null">
+                promote_price = #{promotePrice},
+            </if>
+            <if test="stock != null">
+                stock = #{stock},
+            </if>
+            <if test="categoryId != null">
+                cid = #{categoryId},
+            </if>
+            <if test="createDate != null">
+                create_date = #{createDate}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>

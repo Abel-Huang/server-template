@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-4.0.xsd
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!--启用扫描机制，并指定扫描对应的包-->
+    <context:annotation-config/>
+    <context:component-scan base-package="cn.abelib.tmall.*"/>
+
+    <!--设置属性文件-->
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <array>
+                <value>classpath:log4j.properties</value>
+                <value>classpath:database-config.properties</value>
+            </array>
+        </property>
+        <property name="ignoreResourceNotFound" value="true"/>
+    </bean>
+
+    <!--配置数据源-->
+    <!--<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">-->
+        <!--<property name="driverClassName" value="${jdbc.database.driver}"/>-->
+        <!--<property name="url" value="${jdbc.database.url}"/>-->
+        <!--<property name="username" value="${jdbc.database.username}"/>-->
+        <!--<property name="password" value="${jdbc.database.password}"/>-->
+    <!--</bean>-->
+
+    <!--配置数据源，使用Druid数据库连接池 -->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <property name="driverClassName" value="${jdbc.database.driver}"/>
+        <property name="Url" value="${jdbc.database.url}"/>
+        <property name="username" value="${jdbc.database.username}"/>
+        <property name="password" value="${jdbc.database.password}"/>
+        <property name="initialSize" value="${jdbc.database.initialSize}"/>
+        <property name="minIdle" value="${jdbc.database.minIdle}"/>
+        <property name="maxActive" value="${jdbc.database.maxActive}"/>
+        <property name="maxWait" value="${jdbc.database.maxWait}"/>
+        <property name="timeBetweenEvictionRunsMillis" value="${jdbc.database.timeBetweenEvictionRunsMillis}"/>
+        <property name="minEvictableIdleTimeMillis" value="${jdbc.database.minEvictableIdleTimeMillis}"/>
+        <property name="validationQuery" value="${jdbc.database.validationQuery}"/>
+        <property name="testWhileIdle" value="${jdbc.database.testWhileIdle}"/>
+        <property name="testOnBorrow" value="${jdbc.database.testOnBorrow}"/>
+        <property name="testOnReturn" value="${jdbc.database.testOnReturn}"/>
+        <property name="poolPreparedStatements" value="${jdbc.database.poolPreparedStatements}"/>
+        <property name="maxPoolPreparedStatementPerConnectionSize" value="${jdbc.database.maxPoolPreparedStatementPerConnectionSize}"/>
+    </bean>
+
+    <!--配置SQLSession-->
+    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="typeAliasesPackage" value="cn.abelib.tmall.bean"/>
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="classpath:spring/mybatis-config.xml"/>
+        <property name="mapperLocations" value="classpath:mapper/*.xml"/>
+        <!--插件-->
+        <property name="plugins">
+            <array>
+                <bean class="com.github.pagehelper.PageInterceptor">
+                    <property name="properties">
+                        <value>
+                        </value>
+                    </property>
+                </bean>
+            </array>
+        </property>
+    </bean>
+
+    <!--事务管理器配置数据源事务-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!--使用注解定义事务-->
+   <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <!--设置dao层映射文件-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="cn.abelib.tmall.dao"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSession"/>
+        <property name="annotationClass" value="org.springframework.stereotype.Repository"/>
+    </bean>
+
+    <!--配置SQlSessionTemplate-->
+    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg ref="sqlSession"/>
+        <constructor-arg value="SIMPLE"/>
+    </bean>
+</beans>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.abelib.tmall.dao.OrderDao">
+    <resultMap id="orderMap" type="Order">
+        <id property="id" column="id"/>
+        <result property="orderCode" column="order_code"/>
+        <result property="address" column="address"/>
+        <result property="post" column="post"/>
+        <result property="receiver" column="receiver"/>
+        <result property="mobile" column="mobile"/>
+        <result property="userMessage" column="user_message"/>
+        <result property="createDate" column="create_date"/>
+        <result property="payDate" column="pay_date"/>
+        <result property="deliveryDate" column="delivery_date"/>
+        <result property="confirmDate" column="confirm_date"/>
+        <result property="userId" column="uid"/>
+        <result property="orderStatus" column="order_status"/>
+    </resultMap>
+    <cache/>
+
+    <select id="countOrder" resultType="int">
+        select count(*) from order_
+    </select>
+
+    <!--遍历整个 order_ 表-->
+    <select id="listAllOrder" resultMap="orderMap">
+        select * from order_
+    </select>
+
+    <!--通过id获取 Order-->
+    <select id="getOrderById" parameterType="int" resultMap="orderMap">
+        select * from order_
+        where id = #{id}
+    </select>
+
+    <!--插入，并且主键回填-->
+    <insert id="insertOrder"  parameterType="Order"
+            useGeneratedKeys="true"  keyProperty="id">
+        insert into order_(order_code, address, post, receiver, mobile, user_message, create_date, pay_date, delivery_date, confirm_date, uid, order_status)
+        values(#{orderCode}, #{address}, #{post}, #{receiver}, #{mobile}, #{userMessage}, #{createDate}, #{payDate}, #{deliveryDate}, #{confirmDate}, #{userId}, #{orderStatus})
+    </insert>
+
+    <!--删除 Order-->
+    <delete id="deleteOrder" parameterType="int">
+        delete from order_ where id = #{id}
+    </delete>
+
+    <!--更新 Order-->
+    <update id="updateOrder" parameterType="Order">
+        update order_
+        <set>
+            <if test="orderStatus != null and orderStatus != ''">
+                order_status = #{orderStatus},
+            </if>
+            <if test="address != null and address != ''">
+                address = #{address},
+            </if>
+            <if test="post != null and post != ''">
+                post = #{post},
+            </if>
+            <if test="receiver != null and receiver != ''">
+                receiver = #{receiver},
+            </if>
+            <if test="mobile != null and mobile != ''">
+                mobile = #{mobile},
+            </if>
+            <if test="userMessage != null and userMessage != ''">
+                user_message = #{userMessage},
+            </if>
+            <if test="createDate != null">
+                create_date = #{createDate},
+            </if>
+            <if test="payDate != null">
+                pay_date = #{payDate},
+            </if>
+            <if test="deliveryDate != null">
+                delivery_date = #{deliveryDate},
+            </if>
+            <if test="confirmDate != null">
+                confirm_date = #{confirmDate},
+            </if>
+            <if test="userId != null">
+                uid = #{userId},
+            </if>
+            <if test="orderStatus != null and orderStatus != ''">
+                order_status = #{orderStatus}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>

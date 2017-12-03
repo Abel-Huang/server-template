@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.abelib.tmall.dao.ProductImageDao">
+    <resultMap id="productImageMap" type="ProductImage">
+        <id property="id" column="id"/>
+        <result property="productId" column="productId"/>
+        <result property="image_type" column="imageType"/>
+    </resultMap>
+    <cache/>
+
+    <select id="countProduct" resultType="int">
+        select count(*) from product_image
+    </select>
+    <!--遍历整个 ProductImage 表-->
+    <select id="listAllProductImage" parameterType="ProductImageParam" resultMap="productImageMap">
+        select * from product_image
+        <where>
+            <if test="productId != null ">
+                pid = #{productId},
+            </if>
+            <if test="imageType != null and imageType != ''">
+                image_type = #{imageType}
+            </if>
+        </where>
+    </select>
+
+    <!--通过id获取 ProductImage-->
+    <select id="getProductImageById" parameterType="int" resultMap="productImageMap">
+        select * from product_image
+        where id = #{id}
+    </select>
+
+    <!--插入，并且主键回填-->
+    <insert id="insertProductImage"  parameterType="ProductImage"
+            useGeneratedKeys="true"  keyProperty="id">
+        insert into product_image(pid, image_type) values(#{productId}, #{imageType})
+    </insert>
+
+    <!--删除 ProductImage-->
+    <delete id="deleteProductImage" parameterType="int">
+        delete from product_image where id = #{id}
+    </delete>
+
+    <!--更新 ProductImage-->
+    <update id="updateProductImage" parameterType="ProductImage">
+        update product_image
+        <set>
+            <if test="productId != null">
+                pid = #{productId},
+            </if>
+            <if test="imageType != null and imageType != ''">
+                image_type = #{imageType}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>
