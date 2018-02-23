@@ -5,6 +5,7 @@
 * MyBatis:ORM框架
 * Redis:缓存
 * Kafka:消息队列
+* Zookeeper:注册中心
 * ElasticSearch:全文搜索
 * Mongodb:图片文件服务器
 * MySQL:数据库
