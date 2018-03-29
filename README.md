@@ -1,4 +1,4 @@
-# javaframework-server 
+# micro-server
 一个电商服务端demo，主要用于技术的学习和实践 
 
 * Spring/SpringBoot:用于搭建项目整体架构
@@ -6,7 +6,6 @@
 * PageHelper:国产开源数据库表分页工具
 * Redis:缓存和分布式session
 * Jedis:Redis客户端
-* Kafka:消息队列
 * ElasticSearch:全文搜索引擎
 * Mongodb:图片文件服务器
 * MySQL:数据库
