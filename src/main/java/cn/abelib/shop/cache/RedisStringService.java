@@ -4,6 +4,7 @@ import cn.abelib.shop.cache.key.KeyPrefix;
 import cn.abelib.shop.common.tools.JsonUtil;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
@@ -43,6 +44,23 @@ public class RedisStringService {
     }
 
     /**
+     *  不带前缀 并且不在内部进行序列化的get方法
+     * @param key
+     * @return
+     */
+    public String get(String key){
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            String value = jedis.get(key);
+            log.info("get key:{} value:{}", key, value);
+            return value;
+        } finally {
+            returnResource(jedis);
+        }
+    }
+
+    /**
      * set
      * @param keyPrefix
      * @param key
@@ -74,6 +92,32 @@ public class RedisStringService {
     }
 
     /**
+     *  不带前缀 并且内部不进行序列化的set方法
+     * @param key
+     * @param value
+     * @param expire
+     * @return
+     */
+    public boolean set(String key, int expire, String value){
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            if (StringUtils.isEmpty(key) || StringUtils.isEmpty(value))
+                return false;
+            // 判断是否需要设置过期时间
+            if (expire <= 0) {
+                jedis.set(key, value);
+            } else {
+                jedis.setex(key, expire, value);
+            }
+            log.info("set key:{} value:{}", key, value);
+            return true;
+        } finally {
+            returnResource(jedis);
+        }
+    }
+
+    /**
      * exists
      * @param keyPrefix
      * @param key
@@ -85,7 +129,22 @@ public class RedisStringService {
             jedis = jedisPool.getResource();
             // 给key加上前缀
             String realKey = keyPrefix.getPrefix() + key;
-            return jedis.exists(realKey);
+            return this.exists(realKey);
+        }finally {
+            returnResource(jedis);
+        }
+    }
+
+    /**
+     * exists
+     * @param key
+     * @return
+     */
+    public boolean exists(String key){
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            return jedis.exists(key);
         }finally {
             returnResource(jedis);
         }
@@ -141,6 +200,21 @@ public class RedisStringService {
         }
     }
 
+    /**
+     *  不带前缀的删除
+     * @param key
+     * @return
+     */
+    public boolean delete(String key){
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            long ret =  jedis.del(key);
+            return ret > 0;
+        }finally {
+            returnResource(jedis);
+        }
+    }
 
     /**
      *  使用 Gson 字符串转为对象,

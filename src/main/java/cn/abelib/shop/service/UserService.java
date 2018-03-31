@@ -10,8 +10,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 
 public interface UserService {
-    User getByToken(HttpServletResponse response, String token);
-
     Response<User> login(String userName, String userPassword);
 
     Response<String> register(User user);

@@ -2,18 +2,22 @@ package cn.abelib.shop.controller.portal;
 
 
 import cn.abelib.shop.cache.RedisStringService;
-import cn.abelib.shop.cache.key.UserKeyPrefix;
 import cn.abelib.shop.common.constant.BusinessConstant;
+import cn.abelib.shop.common.tools.CookieUtil;
+import cn.abelib.shop.common.tools.JsonUtil;
 import cn.abelib.shop.pojo.User;
 import cn.abelib.shop.common.result.Response;
 import cn.abelib.shop.common.constant.StatusConstant;
 import cn.abelib.shop.service.UserService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
@@ -35,25 +39,35 @@ public class PortalUserController {
      * @return
      */
     @PostMapping(value = "/login.do")
-    public Response<User> login(String userName, String userPassword, HttpSession session){
+    public Response<User> login(String userName, String userPassword, HttpSession session, HttpServletResponse httpServletResponse){
         Response<User> response = userService.login(userName, userPassword);
         if (response.isSuccess()){
-
-            //session.setAttribute(BusinessConstant.CURRENT_USER, response.getBody());
-            redisStringService.set(UserKeyPrefix.sesson, session.getId(), response.getClass());
+            // 写入Cookie
+            CookieUtil.writeToken(httpServletResponse, session.getId());
+            // 将用户信息写入到Redis中
+            redisStringService.set(session.getId(), BusinessConstant.RedisCacheExtime.REDIS_SESSION_EXTIME, JsonUtil.obj2Str(response.getBody()));
         }
         return response;
     }
 
+
     /**
      *  退出登录
-     * @param session
+     * @param request
+     * @param response
      * @return
      */
-    @GetMapping(value = "/logout")
-    public Response logout(HttpSession session) {
-        // 从session中移除用户信息
-        session.removeAttribute(BusinessConstant.CURRENT_USER);
+    @GetMapping(value = "/logout.do")
+    public Response logout(HttpServletRequest request, HttpServletResponse response) {
+        String token = CookieUtil.readToken(request);
+        if (StringUtils.isEmpty(token)){
+            return Response.failed(StatusConstant.USER_NOT_LOGIN);
+        }
+        CookieUtil.removeToken(request, response);
+        if (!redisStringService.exists(token)){
+            return Response.failed(StatusConstant.USER_NOT_LOGIN);
+        }
+        redisStringService.delete(token);
         return Response.success(StatusConstant.GENERAL_SUCCESS);
     }
 
@@ -62,19 +76,24 @@ public class PortalUserController {
      * @param user
      * @return
      */
-    @PostMapping(value = "/register")
+    @PostMapping(value = "/register.do")
     public Response register(User user){
         return userService.register(user);
     }
 
     /**
      *  获取用户信息
-     * @param session
+     * @param request
      * @return
      */
-    @GetMapping(value = "/getUserInfo")
-    public Response<User> getUserInfo(HttpSession session){
-        User user = (User) session.getAttribute(BusinessConstant.CURRENT_USER);
+    @GetMapping(value = "/get_user_info.do")
+    public Response<User> getUserInfo(HttpServletRequest request){
+        String token = CookieUtil.readToken(request);
+        if (StringUtils.isEmpty(token)){
+            return Response.failed(StatusConstant.USER_NOT_LOGIN);
+        }
+        String userJson = redisStringService.get(token);
+        User user = JsonUtil.str2Obj(userJson, User.class);
         if (user != null){
             return Response.success(StatusConstant.GENERAL_SUCCESS, user);
         }
@@ -83,14 +102,19 @@ public class PortalUserController {
 
     /**
      *  修改用户密码
-     * @param session
+     * @param request
      * @param originalPass
      * @param newPass
      * @return
      */
-    @PostMapping(value = "/resetPassword")
-    public Response<String> resetPassword(HttpSession session, String originalPass, String newPass){
-        User user = (User) session.getAttribute(BusinessConstant.CURRENT_USER);
+    @PostMapping(value = "/reset_password.do")
+    public Response<String> resetPassword(HttpServletRequest request, String originalPass, String newPass){
+        String token = CookieUtil.readToken(request);
+        if (StringUtils.isEmpty(token)){
+            return Response.failed(StatusConstant.USER_NOT_LOGIN);
+        }
+        String userJson = redisStringService.get(token);
+        User user = JsonUtil.str2Obj(userJson, User.class);
         if (user == null){
             return Response.failed(StatusConstant.USER_NOT_LOGIN);
         }
@@ -99,22 +123,28 @@ public class PortalUserController {
 
     /**
      *  修改用户信息
-     * @param session
+     * @param request
      * @param user
      * @return
      */
-    @PostMapping(value = "/updateUserInfo")
-    public Response<User> updateUserInfo(HttpSession session, User user){
-        User currentUser = (User) session.getAttribute(BusinessConstant.CURRENT_USER);
+    @PostMapping(value = "/update_user_info.do")
+    public Response<User> updateUserInfo(HttpServletRequest request, User user){
+        String token = CookieUtil.readToken(request);
+        if (StringUtils.isEmpty(token)){
+            return Response.failed(StatusConstant.USER_NOT_LOGIN);
+        }
+        String userJson = redisStringService.get(token);
+        User currentUser = JsonUtil.str2Obj(userJson, User.class);
         if (currentUser == null){
             return Response.failed(StatusConstant.USER_NOT_LOGIN);
         }
+
         user.setId(currentUser.getId());
         user.setUserName(currentUser.getUserName());
         Response<User> response = userService.updateUserInfo(user);
         if (response.isSuccess()){
             response.getBody().setUserName(currentUser.getUserName());
-            session.setAttribute(BusinessConstant.CURRENT_USER, response.getBody());
+            redisStringService.set(token, BusinessConstant.RedisCacheExtime.REDIS_SESSION_EXTIME, JsonUtil.obj2Str(response.getBody()));
         }
         return response;
     }
