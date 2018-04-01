@@ -33,7 +33,7 @@ public class AdminCategoryController {
     @Autowired
     private RedisStringService redisStringService;
 
-    @PostMapping(value = "/add")
+    @PostMapping(value = "/add.do")
     public Response addCategory(HttpServletRequest request, String categoryName,
                                 @RequestParam(value = "parentId", defaultValue = "0") Integer parentId){
         String token = CookieUtil.readToken(request);
@@ -52,7 +52,7 @@ public class AdminCategoryController {
         }
     }
 
-    @GetMapping("/setCategoryName")
+    @GetMapping("/set_category_name.do")
     public Response setCategoryName(HttpServletRequest request, String categoryName, Integer categoryId){
         String token = CookieUtil.readToken(request);
         if (StringUtils.isEmpty(token)){
@@ -70,7 +70,7 @@ public class AdminCategoryController {
         }
     }
 
-    @PostMapping(value = "/getChildrenList")
+    @PostMapping(value = "/get_children_list.do")
     public Response<List<Category>> getChildrenParallelCategory(HttpServletRequest request,
                                                       @RequestParam(value = "categoryId", defaultValue = "0") Integer categoryId){
         String token = CookieUtil.readToken(request);

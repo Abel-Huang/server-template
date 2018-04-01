@@ -12,3 +12,4 @@
 * Druid:Alibaba开源的数据库连接池
 * Guava:谷歌开源的Java工具类
 * Tomcat:Servlet应用服务器
+* Jackson:序列化框架

@@ -25,6 +25,16 @@ public class PortalProductController {
         return productService.getProductDetailPortal(productId);
     }
 
+    /**
+     *  针对商品详情信息的RestFul API改造
+     * @param productId
+     * @return
+     */
+    @GetMapping("/{productId}")
+    public Response<ProductDetailVo> getDetailRest(@PathVariable("productId") Integer productId){
+        return productService.getProductDetailPortal(productId);
+    }
+
     @GetMapping("/list")
     public Response<PageInfo> listProduct(@RequestParam(value = "keyword", required = false) String keyword,
                                           @RequestParam(value = "categoryId", required = false) Integer categoryId,

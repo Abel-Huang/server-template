@@ -36,7 +36,7 @@ public class AdminProductController {
      * @param pageSize
      * @return
      */
-    @GetMapping("/list")
+    @GetMapping("/list.do")
     public Response listProduct(HttpServletRequest request,
                                 @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
                                 @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize){
@@ -65,7 +65,7 @@ public class AdminProductController {
      * @param pageSize
      * @return
      */
-    @GetMapping("/search")
+    @GetMapping("/search.do")
     public Response productSearch(HttpServletRequest request, String productName, Integer productId,
                                   @RequestParam(value = "pageNum", defaultValue = "10") Integer pageNum,
                                 @RequestParam(value = "pageSize", defaultValue = "1") Integer pageSize) {
@@ -91,7 +91,7 @@ public class AdminProductController {
      * @param product
      * @return
      */
-    @PostMapping("/save")
+    @PostMapping("/save.do")
     public Response saveProduct(HttpServletRequest request, Product product){
         String token = CookieUtil.readToken(request);
         if (StringUtils.isEmpty(token)){
@@ -116,7 +116,7 @@ public class AdminProductController {
      * @param status
      * @return
      */
-    @PostMapping("/setStatus")
+    @PostMapping("/set_status.do")
     public Response setSaleStatus(HttpServletRequest request, Integer productId, Integer status){
         String token = CookieUtil.readToken(request);
         if (StringUtils.isEmpty(token)){
@@ -140,7 +140,7 @@ public class AdminProductController {
      * @param productId
      * @return
      */
-    @PostMapping("/detail")
+    @PostMapping("/detail.do")
     public Response getDetail(HttpServletRequest request, Integer productId){
         String token = CookieUtil.readToken(request);
         if (StringUtils.isEmpty(token)){
@@ -159,7 +159,7 @@ public class AdminProductController {
         return Response.failed(StatusConstant.NOT_ADMIN_ERROR);
     }
 
-    @GetMapping("/delete")
+    @GetMapping("/delete.do")
     public Response deleteProduct(Integer id){
         return Response.failed(StatusConstant.GENERAL_SUCCESS);
     }

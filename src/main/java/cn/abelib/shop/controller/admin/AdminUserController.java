@@ -37,7 +37,7 @@ public class AdminUserController {
      * @param session
      * @return
      */
-    @PostMapping(value = "/login")
+    @PostMapping(value = "/login.do")
     public Response<User> login(String userName, String userPassword, HttpSession session, HttpServletResponse httpServletResponse){
         Response<User> response = userService.login(userName, userPassword);
         if (response.isSuccess()){
