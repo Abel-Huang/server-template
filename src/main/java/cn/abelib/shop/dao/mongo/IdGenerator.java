@@ -1,8 +1,8 @@
-package cn.abelib.shop.mongo;
+package cn.abelib.shop.dao.mongo;
 
 /**
  * Created by abel on 2018/2/24.
- *  取时间戳后十位作为id
+ *  MongoDB 取时间戳后十位作为id
  */
 public class IdGenerator {
     public static String generator(){

@@ -1,4 +1,4 @@
-package cn.abelib.shop.cache.key;
+package cn.abelib.shop.common.cache;
 
 import cn.abelib.shop.common.constant.BusinessConstant;
 

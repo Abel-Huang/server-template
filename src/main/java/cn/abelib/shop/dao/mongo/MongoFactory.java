@@ -1,9 +1,9 @@
-package cn.abelib.shop.mongo;
+package cn.abelib.shop.dao.mongo;
 
 import cn.abelib.shop.common.constant.StatusConstant;
 import cn.abelib.shop.common.exception.GlobalException;
+import cn.abelib.shop.config.MongoConfig;
 import com.mongodb.MongoClient;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

@@ -1,6 +1,6 @@
-package cn.abelib.shop.cache;
+package cn.abelib.shop.dao.redis;
 
-import cn.abelib.shop.cache.key.KeyPrefix;
+import cn.abelib.shop.common.cache.KeyPrefix;
 import cn.abelib.shop.common.tools.JsonUtil;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
@@ -180,6 +180,24 @@ public class RedisStringService {
             returnResource(jedis);
         }
     }
+
+    /**
+     *  给key修改生存时间
+     * @param key
+     * @return
+     */
+    public boolean expire(String key, int expire){
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            long ret =  jedis.expire(key, expire);
+            log.info("get key:{} result:{}", key, ret);
+            return ret > 0;
+        }finally {
+            returnResource(jedis);
+        }
+    }
+
 
     /**
      *  删除

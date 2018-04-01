@@ -1,4 +1,4 @@
-package cn.abelib.shop.mongo;
+package cn.abelib.shop.dao.mongo;
 
 import com.google.common.collect.Lists;
 import com.mongodb.BasicDBObject;

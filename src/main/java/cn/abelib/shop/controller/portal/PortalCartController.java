@@ -1,19 +1,24 @@
 package cn.abelib.shop.controller.portal;
 
 
+import cn.abelib.shop.dao.redis.RedisStringService;
 import cn.abelib.shop.common.constant.BusinessConstant;
 import cn.abelib.shop.common.constant.StatusConstant;
 import cn.abelib.shop.common.result.Response;
+import cn.abelib.shop.common.tools.CookieUtil;
+import cn.abelib.shop.common.tools.JsonUtil;
 import cn.abelib.shop.pojo.User;
 import cn.abelib.shop.service.CartService;
 import cn.abelib.shop.vo.CartVo;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
+
 
 
 
@@ -26,55 +31,89 @@ import javax.servlet.http.HttpSession;
 public class PortalCartController {
     @Autowired
     private CartService cartService;
+    @Autowired
+    private RedisStringService redisStringService;
 
     /**
      *  添加商品到购物车
-     * @param session
+     * @param request
      * @param count
      * @param productId
      * @return
      */
     @PostMapping("/add")
-    public Response<CartVo> add(HttpSession session, Integer count, Integer productId){
-        User user = (User) session.getAttribute(BusinessConstant.CURRENT_USER);
-        if (user == null){
+    public Response<CartVo> add(HttpServletRequest request, Integer count, Integer productId){
+        String token = CookieUtil.readToken(request);
+        if (StringUtils.isEmpty(token)){
             return Response.failed(StatusConstant.USER_NOT_LOGIN);
         }
-        return cartService.add(user.getId(), productId, count);
+        String userJson = redisStringService.get(token);
+        User user = JsonUtil.str2Obj(userJson, User.class);
+        if (user != null){
+            return cartService.add(user.getId(), productId, count);
+        }
+        return Response.failed(StatusConstant.USER_NOT_LOGIN);
     }
 
+    /**
+     *  更新
+     * @param request
+     * @param count
+     * @param productId
+     * @return
+     */
     @PostMapping("/update")
-    public Response<CartVo> update(HttpSession session, Integer count, Integer productId){
-        User user = (User) session.getAttribute(BusinessConstant.CURRENT_USER);
-        if (user == null){
+    public Response<CartVo> update(HttpServletRequest request, Integer count, Integer productId){
+        String token = CookieUtil.readToken(request);
+        if (StringUtils.isEmpty(token)){
             return Response.failed(StatusConstant.USER_NOT_LOGIN);
         }
-        return cartService.update(user.getId(), productId, count);
+        String userJson = redisStringService.get(token);
+        User user = JsonUtil.str2Obj(userJson, User.class);
+        if (user != null){
+            return cartService.update(user.getId(), productId, count);
+        }
+        return Response.failed(StatusConstant.USER_NOT_LOGIN);
     }
 
     @PostMapping("/delete")
-    public Response<CartVo> delete(HttpSession session, String productIds){
-        User user = (User) session.getAttribute(BusinessConstant.CURRENT_USER);
-        if (user == null){
+    public Response<CartVo> delete(HttpServletRequest request, String productIds){
+        String token = CookieUtil.readToken(request);
+        if (StringUtils.isEmpty(token)){
             return Response.failed(StatusConstant.USER_NOT_LOGIN);
         }
-        return cartService.delete(user.getId(), productIds);
+        String userJson = redisStringService.get(token);
+        User user = JsonUtil.str2Obj(userJson, User.class);
+        if (user != null){
+            return cartService.delete(user.getId(), productIds);
+        }
+        return Response.failed(StatusConstant.USER_NOT_LOGIN);
     }
 
     @GetMapping("/list")
-    public Response<CartVo> list(HttpSession session) {
-        User user = (User) session.getAttribute(BusinessConstant.CURRENT_USER);
-        if (user == null) {
+    public Response<CartVo> list(HttpServletRequest request) {
+        String token = CookieUtil.readToken(request);
+        if (StringUtils.isEmpty(token)){
             return Response.failed(StatusConstant.USER_NOT_LOGIN);
         }
-        return cartService.list(user.getId());
+        String userJson = redisStringService.get(token);
+        User user = JsonUtil.str2Obj(userJson, User.class);
+        if (user != null){
+            return cartService.list(user.getId());
+        }
+        return Response.failed(StatusConstant.USER_NOT_LOGIN);
     }
 
     // 全选
     @GetMapping("/selectAll")
-    public Response<CartVo> selectAll(HttpSession session) {
-        User user = (User) session.getAttribute(BusinessConstant.CURRENT_USER);
-        if (user == null) {
+    public Response<CartVo> selectAll(HttpServletRequest request) {
+        String token = CookieUtil.readToken(request);
+        if (StringUtils.isEmpty(token)){
+            return Response.failed(StatusConstant.USER_NOT_LOGIN);
+        }
+        String userJson = redisStringService.get(token);
+        User user = JsonUtil.str2Obj(userJson, User.class);
+        if (user == null){
             return Response.failed(StatusConstant.USER_NOT_LOGIN);
         }
         return cartService.selectOrUnselectAll(user.getId(), BusinessConstant.Cart.CHECKED);
@@ -82,9 +121,14 @@ public class PortalCartController {
 
     // 全反选
     @GetMapping("/unSelectAll")
-    public Response<CartVo> unSelectAll(HttpSession session) {
-        User user = (User) session.getAttribute(BusinessConstant.CURRENT_USER);
-        if (user == null) {
+    public Response<CartVo> unSelectAll(HttpServletRequest request) {
+        String token = CookieUtil.readToken(request);
+        if (StringUtils.isEmpty(token)){
+            return Response.failed(StatusConstant.USER_NOT_LOGIN);
+        }
+        String userJson = redisStringService.get(token);
+        User user = JsonUtil.str2Obj(userJson, User.class);
+        if (user == null){
             return Response.failed(StatusConstant.USER_NOT_LOGIN);
         }
         return cartService.selectOrUnselectAll(user.getId(), BusinessConstant.Cart.UN_CHECKED);
@@ -92,9 +136,14 @@ public class PortalCartController {
 
     // 单选
     @GetMapping("/select")
-    public Response<CartVo> select(HttpSession session, Integer productId) {
-        User user = (User) session.getAttribute(BusinessConstant.CURRENT_USER);
-        if (user == null) {
+    public Response<CartVo> select(HttpServletRequest request, Integer productId) {
+        String token = CookieUtil.readToken(request);
+        if (StringUtils.isEmpty(token)){
+            return Response.failed(StatusConstant.USER_NOT_LOGIN);
+        }
+        String userJson = redisStringService.get(token);
+        User user = JsonUtil.str2Obj(userJson, User.class);
+        if (user == null){
             return Response.failed(StatusConstant.USER_NOT_LOGIN);
         }
         return cartService.selectOrUnselect(user.getId(), productId, BusinessConstant.Cart.CHECKED);
@@ -102,9 +151,14 @@ public class PortalCartController {
 
     // 单反选
     @GetMapping("/unSelect")
-    public Response<CartVo> unSelect(HttpSession session, Integer productId) {
-        User user = (User) session.getAttribute(BusinessConstant.CURRENT_USER);
-        if (user == null) {
+    public Response<CartVo> unSelect(HttpServletRequest request, Integer productId) {
+        String token = CookieUtil.readToken(request);
+        if (StringUtils.isEmpty(token)){
+            return Response.failed(StatusConstant.USER_NOT_LOGIN);
+        }
+        String userJson = redisStringService.get(token);
+        User user = JsonUtil.str2Obj(userJson, User.class);
+        if (user == null){
             return Response.failed(StatusConstant.USER_NOT_LOGIN);
         }
         return cartService.selectOrUnselect(user.getId(), productId, BusinessConstant.Cart.UN_CHECKED);
@@ -112,9 +166,14 @@ public class PortalCartController {
 
     // 查询用户当前购物车的产品数量，计算的是所有的产品的总数量
     @GetMapping("cartCount")
-    public Response<Integer> getCartProductCount(HttpSession session){
-        User user = (User) session.getAttribute(BusinessConstant.CURRENT_USER);
-        if (user == null) {
+    public Response<Integer> getCartProductCount(HttpServletRequest request){
+        String token = CookieUtil.readToken(request);
+        if (StringUtils.isEmpty(token)){
+            return Response.failed(StatusConstant.USER_NOT_LOGIN);
+        }
+        String userJson = redisStringService.get(token);
+        User user = JsonUtil.str2Obj(userJson, User.class);
+        if (user == null){
             return Response.success(StatusConstant.GENERAL_SUCCESS, 0);
         }
         return cartService.getCartProductCount(user.getId());

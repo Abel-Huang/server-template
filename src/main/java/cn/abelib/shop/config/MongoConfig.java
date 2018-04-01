@@ -1,4 +1,4 @@
-package cn.abelib.shop.mongo;
+package cn.abelib.shop.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

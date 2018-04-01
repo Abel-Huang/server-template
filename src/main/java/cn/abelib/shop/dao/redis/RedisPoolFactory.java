@@ -1,5 +1,6 @@
-package cn.abelib.shop.cache;
+package cn.abelib.shop.dao.redis;
 
+import cn.abelib.shop.config.RedisConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;

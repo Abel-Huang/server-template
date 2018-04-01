@@ -1,17 +1,20 @@
 package cn.abelib.shop.controller.admin;
 
 
-import cn.abelib.shop.common.constant.BusinessConstant;
+import cn.abelib.shop.common.tools.CookieUtil;
+import cn.abelib.shop.common.tools.JsonUtil;
+import cn.abelib.shop.dao.redis.RedisStringService;
 import cn.abelib.shop.pojo.Category;
 import cn.abelib.shop.common.result.Response;
 import cn.abelib.shop.common.constant.StatusConstant;
 import cn.abelib.shop.pojo.User;
 import cn.abelib.shop.service.CategoryService;
 import cn.abelib.shop.service.UserService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -27,14 +30,22 @@ public class AdminCategoryController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private RedisStringService redisStringService;
+
     @PostMapping(value = "/add")
-    public Response addCategory(HttpSession session, String categoryName,
-                                        @RequestParam(value = "parentId", defaultValue = "0") Integer parentId){
-        User currentUser = (User) session.getAttribute(BusinessConstant.CURRENT_USER);
-        if (currentUser == null){
+    public Response addCategory(HttpServletRequest request, String categoryName,
+                                @RequestParam(value = "parentId", defaultValue = "0") Integer parentId){
+        String token = CookieUtil.readToken(request);
+        if (StringUtils.isEmpty(token)){
             return Response.failed(StatusConstant.USER_NOT_LOGIN);
         }
-        if (userService.checkAdminRole(currentUser).isSuccess()){
+        String userJson = redisStringService.get(token);
+        User user = JsonUtil.str2Obj(userJson, User.class);
+        if (user == null){
+            return Response.failed(StatusConstant.USER_NOT_LOGIN);
+        }
+        if (userService.checkAdminRole(user).isSuccess()){
             return categoryService.addCategory(categoryName, parentId);
         }else {
             return Response.failed(StatusConstant.NOT_ADMIN_ERROR);
@@ -42,12 +53,17 @@ public class AdminCategoryController {
     }
 
     @GetMapping("/setCategoryName")
-    public Response setCategoryName(HttpSession session, String categoryName, Integer categoryId){
-        User currentUser = (User) session.getAttribute(BusinessConstant.CURRENT_USER);
-        if (currentUser == null){
+    public Response setCategoryName(HttpServletRequest request, String categoryName, Integer categoryId){
+        String token = CookieUtil.readToken(request);
+        if (StringUtils.isEmpty(token)){
             return Response.failed(StatusConstant.USER_NOT_LOGIN);
         }
-        if (userService.checkAdminRole(currentUser).isSuccess()){
+        String userJson = redisStringService.get(token);
+        User user = JsonUtil.str2Obj(userJson, User.class);
+        if (user == null){
+            return Response.failed(StatusConstant.USER_NOT_LOGIN);
+        }
+        if (userService.checkAdminRole(user).isSuccess()){
             return categoryService.updateCategoryByName(categoryId, categoryName);
         }else {
             return Response.failed(StatusConstant.NOT_ADMIN_ERROR);
@@ -55,13 +71,18 @@ public class AdminCategoryController {
     }
 
     @PostMapping(value = "/getChildrenList")
-    public Response<List<Category>> getChildrenParallelCategory(HttpSession session,
+    public Response<List<Category>> getChildrenParallelCategory(HttpServletRequest request,
                                                       @RequestParam(value = "categoryId", defaultValue = "0") Integer categoryId){
-        User currentUser = (User) session.getAttribute(BusinessConstant.CURRENT_USER);
-        if (currentUser == null){
+        String token = CookieUtil.readToken(request);
+        if (StringUtils.isEmpty(token)){
             return Response.failed(StatusConstant.USER_NOT_LOGIN);
         }
-        if (userService.checkAdminRole(currentUser).isSuccess()){
+        String userJson = redisStringService.get(token);
+        User user = JsonUtil.str2Obj(userJson, User.class);
+        if (user == null){
+            return Response.failed(StatusConstant.USER_NOT_LOGIN);
+        }
+        if (userService.checkAdminRole(user).isSuccess()){
             return categoryService.getChildrenParallelCategory(categoryId);
         }else {
             return Response.failed(StatusConstant.NOT_ADMIN_ERROR);
