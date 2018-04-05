@@ -9,6 +9,7 @@ import cn.abelib.shop.dao.redis.RedisStringService;
 import cn.abelib.shop.pojo.Shipping;
 import cn.abelib.shop.pojo.User;
 import cn.abelib.shop.service.ShippingService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
  * Created by abel on 2017/9/12.
  * 用户收获地址
  */
+@Slf4j
 @RestController
 @RequestMapping("/portal/shipping")
 public class PortalShippingController {
@@ -44,6 +46,7 @@ public class PortalShippingController {
         if (user == null){
             return Response.failed(StatusConstant.USER_NOT_LOGIN);
         }
+        log.info("shipping {}", request.getRequestURI(), shipping);
         return shippingService.add(user.getId(), shipping);
     }
 
@@ -58,6 +61,7 @@ public class PortalShippingController {
         if (user == null){
             return Response.failed(StatusConstant.USER_NOT_LOGIN);
         }
+        log.info("shippingId {}", request.getRequestURI(), shippingId);
         return shippingService.del(user.getId(), shippingId);
     }
 
@@ -72,6 +76,7 @@ public class PortalShippingController {
         if (user == null){
             return Response.failed(StatusConstant.USER_NOT_LOGIN);
         }
+        log.info("shipping {}", request.getRequestURI(), shipping);
         return shippingService.update(user.getId(), shipping);
     }
 
@@ -86,6 +91,7 @@ public class PortalShippingController {
         if (user == null){
             return Response.failed(StatusConstant.USER_NOT_LOGIN);
         }
+        log.info("shippingId {}", request.getRequestURI(), shippingId);
         return shippingService.select(user.getId(), shippingId);
     }
 

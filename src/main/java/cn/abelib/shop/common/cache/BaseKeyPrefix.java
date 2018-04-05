@@ -3,19 +3,26 @@ package cn.abelib.shop.common.cache;
 /**
  * Created by abel on 2018/2/1.
  */
-public abstract class BaseKeyPrefix implements KeyPrefix {
+public class BaseKeyPrefix implements KeyPrefix {
 
     private int expire;
 
     private String keyPrefix;
 
-    public BaseKeyPrefix(int  expire, String keyPrefix){
+    private Class clazz;
+
+    protected BaseKeyPrefix(int  expire, String keyPrefix){
         this.expire = expire;
         this.keyPrefix = keyPrefix;
     }
 
-    public BaseKeyPrefix(String keyPrefix){
+    protected BaseKeyPrefix(String keyPrefix){
         this(0, keyPrefix);
+    }
+
+    protected BaseKeyPrefix(String keyPrefix, Class clazz){
+        this.clazz = clazz;
+        this.keyPrefix = keyPrefix;
     }
 
     /**
@@ -33,7 +40,18 @@ public abstract class BaseKeyPrefix implements KeyPrefix {
      */
     @Override
     public String getPrefix() {
-        String className = getClass().getSimpleName();
+        String className = this.clazz.getSimpleName();
         return className + ":" + keyPrefix;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BaseKeyPrefix that = (BaseKeyPrefix) o;
+
+        if (expire != that.expire) return false;
+        return keyPrefix != null ? keyPrefix.equals(that.keyPrefix) : that.keyPrefix == null;
     }
 }

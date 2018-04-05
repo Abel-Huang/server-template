@@ -1,12 +1,17 @@
 package cn.abelib.shop.service.impl;
 
 
+import cn.abelib.shop.common.cache.CacheKey;
+import cn.abelib.shop.common.cache.KeyPrefixFactory;
 import cn.abelib.shop.common.constant.BusinessConstant;
 import cn.abelib.shop.common.exception.GlobalException;
 import cn.abelib.shop.common.result.Response;
 import cn.abelib.shop.common.constant.StatusConstant;
+import cn.abelib.shop.common.tools.CacheKeyUtil;
 import cn.abelib.shop.common.tools.DateUtil;
+import cn.abelib.shop.common.tools.JsonUtil;
 import cn.abelib.shop.common.tools.PropertiesUtil;
+import cn.abelib.shop.dao.redis.RedisStringService;
 import cn.abelib.shop.pojo.Category;
 import cn.abelib.shop.pojo.Product;
 import cn.abelib.shop.dao.CategoryDao;
@@ -39,6 +44,8 @@ public class ProductServiceImpl implements ProductService{
     private CategoryDao categoryDao;
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private RedisStringService redisStringService;
     /**
      *  分页list
      * @param pageNum
@@ -47,7 +54,21 @@ public class ProductServiceImpl implements ProductService{
      */
     public Response<PageInfo> listProduct(Integer pageNum, Integer pageSize) {
         PageHelper.startPage(pageNum, pageSize);
-        List<Product> productList = productDao.list();
+        List<Product> productList;
+        // 构造商品的key
+        String params = CacheKeyUtil.queryParam(pageNum.toString(), pageSize.toString());
+        String realKey = CacheKeyUtil.md5Key(new CacheKey(KeyPrefixFactory.productKeyPrefix(CacheKeyUtil.key()), params));
+        if (redisStringService.exists(realKey)){
+            // 从缓存中获得数据
+            String result = redisStringService.get(realKey);
+            productList = JsonUtil.str2Obj(result, List.class, Product.class);
+        }else {
+            // 从数据库中获得数据
+            productList = productDao.list();
+            // 将数据写入缓存中
+            redisStringService.set(realKey, BusinessConstant.RedisCacheExtime.REDIS_CACHE_EXTIME, JsonUtil.obj2Str(productList));
+        }
+
         List<ProductListVo> productListVoList = Lists.newArrayList();
         for (Product product : productList){
             ProductListVo productListVo = getProductListVo(product);
@@ -122,7 +143,7 @@ public class ProductServiceImpl implements ProductService{
     }
 
     /**
-     *
+     *  修改商品状态
      * @param productId
      * @param status
      * @return
@@ -205,7 +226,21 @@ public class ProductServiceImpl implements ProductService{
         if (product.getStatus() != BusinessConstant.ProductStatusEnum.ON_SALE.getCode()){
             Response.failed(StatusConstant.PRODUCT_NOT_FOUND);
         }
-        ProductDetailVo productDetailVo = getProductDetailVo(product);
+        ProductDetailVo productDetailVo;
+        // 构造商品Vo的key
+        String params = CacheKeyUtil.queryParam(productId.toString());
+        String realKey = CacheKeyUtil.md5Key(new CacheKey(KeyPrefixFactory.productKeyPrefix(CacheKeyUtil.key()), params));
+        if (redisStringService.exists(realKey)){
+            // 从缓存中获得数据
+            String result = redisStringService.get(realKey);
+            productDetailVo = JsonUtil.str2Obj(result, ProductDetailVo.class);
+        }else {
+            // 从数据库中获得数据
+            productDetailVo = getProductDetailVo(product);
+            // 将数据写入缓存中
+            redisStringService.set(realKey, BusinessConstant.RedisCacheExtime.REDIS_CACHE_EXTIME, JsonUtil.obj2Str(productDetailVo));
+        }
+
         return  Response.success(StatusConstant.GENERAL_SUCCESS, productDetailVo);
     }
 

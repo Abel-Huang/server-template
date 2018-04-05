@@ -1,5 +1,6 @@
-package cn.abelib.shop.common.cache;
+package cn.abelib.shop.test;
 
+import cn.abelib.shop.common.cache.BaseKeyPrefix;
 import cn.abelib.shop.common.constant.BusinessConstant;
 
 /**
@@ -19,4 +20,6 @@ public class UserKeyPrefix extends BaseKeyPrefix {
     public static UserKeyPrefix getById = new UserKeyPrefix("id");
     public static UserKeyPrefix token = new UserKeyPrefix(TOKEN_EXPIRE,"token");
     public static UserKeyPrefix sesson = new UserKeyPrefix(BusinessConstant.RedisCacheExtime.REDIS_SESSION_EXTIME, "session");
+
+    public static UserKeyPrefix cache = new UserKeyPrefix("cache");
 }

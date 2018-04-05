@@ -12,6 +12,7 @@ public class BusinessConstant {
 
     public interface RedisCacheExtime{
         Integer REDIS_SESSION_EXTIME = 60 * 30; // unit second
+        Integer REDIS_CACHE_EXTIME = 60 * 1; // unit second
     }
 
     public interface Role{
