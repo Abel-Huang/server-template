@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+
 /**
  * Created by abel on 2017/9/9.
  */
@@ -46,36 +47,39 @@ public class ProductServiceImpl implements ProductService{
     private CategoryService categoryService;
     @Autowired
     private RedisStringService redisStringService;
+
     /**
-     *  分页list
+     *  分页list, 缓存内容是 List<ProductListVo>
      * @param pageNum
      * @param pageSize
      * @return
      */
     public Response<PageInfo> listProduct(Integer pageNum, Integer pageSize) {
         PageHelper.startPage(pageNum, pageSize);
+        List<ProductListVo> productListVoList;
         List<Product> productList;
+        PageInfo pageInfo;
         // 构造商品的key
         String params = CacheKeyUtil.queryParam(pageNum.toString(), pageSize.toString());
-        String realKey = CacheKeyUtil.md5Key(new CacheKey(KeyPrefixFactory.productKeyPrefix(CacheKeyUtil.key()), params));
+        String realKey = CacheKeyUtil.md5Key(new CacheKey(KeyPrefixFactory.productKeyPrefix(KeyPrefixFactory.ProductKey.LIST_PRODUCT), params));
         if (redisStringService.exists(realKey)){
             // 从缓存中获得数据
             String result = redisStringService.get(realKey);
-            productList = JsonUtil.str2Obj(result, List.class, Product.class);
+            pageInfo = JsonUtil.str2Obj(result, List.class, PageInfo.class);
         }else {
             // 从数据库中获得数据
             productList = productDao.list();
+            productListVoList = Lists.newArrayList();
+            for (Product product : productList){
+                ProductListVo productListVo = getProductListVo(product);
+                productListVoList.add(productListVo);
+            }
+            pageInfo = new PageInfo(productList);
+            pageInfo.setList(productListVoList);
             // 将数据写入缓存中
-            redisStringService.set(realKey, BusinessConstant.RedisCacheExtime.REDIS_CACHE_EXTIME, JsonUtil.obj2Str(productList));
+            redisStringService.set(realKey, BusinessConstant.RedisCacheExtime.REDIS_CACHE_EXTIME, JsonUtil.obj2Str(pageInfo));
         }
 
-        List<ProductListVo> productListVoList = Lists.newArrayList();
-        for (Product product : productList){
-            ProductListVo productListVo = getProductListVo(product);
-            productListVoList.add(productListVo);
-        }
-        PageInfo pageInfo = new PageInfo(productList);
-        pageInfo.setList(productListVoList);
         return Response.success(StatusConstant.GENERAL_SUCCESS, pageInfo);
     }
 
@@ -128,6 +132,12 @@ public class ProductServiceImpl implements ProductService{
            if (product.getId() != null){
                 int rowCount = productDao.updateProduct(product);
                 if (rowCount > 0){
+                    // 清除旧有商品的缓存
+                    String realKey = CacheKeyUtil.md5Key(new CacheKey(KeyPrefixFactory.productKeyPrefix(KeyPrefixFactory.ProductKey.GET_PRODUCT),
+                            CacheKeyUtil.queryParam(product.getId().toString())));
+                    if (redisStringService.exists(realKey)){
+                        redisStringService.delete(realKey);
+                    }
                     return Response.success(StatusConstant.GENERAL_SUCCESS);
                 }
                 return Response.failed(StatusConstant.UPDATE_PRODUCT_FAILED);
@@ -157,6 +167,12 @@ public class ProductServiceImpl implements ProductService{
         product.setStatus(status);
         int rowCount = productDao.updateProduct(product);
         if (rowCount > 0){
+            // 清除旧有商品的缓存
+            String realKey = CacheKeyUtil.md5Key(new CacheKey(KeyPrefixFactory.productKeyPrefix(KeyPrefixFactory.ProductKey.GET_PRODUCT),
+                    CacheKeyUtil.queryParam(productId.toString())));
+            if (redisStringService.exists(realKey)){
+                redisStringService.delete(realKey);
+            }
             return Response.success(StatusConstant.GENERAL_SUCCESS);
         }
         return Response.failed(StatusConstant.UPDATE_PRODUCT_STATUS_FAILED);
@@ -171,11 +187,26 @@ public class ProductServiceImpl implements ProductService{
         if (productId == null){
             throw new GlobalException(StatusConstant.PRAM_BIND_ERROR);
         }
-        Product product = productDao.selectById(productId);
-        if (product == null){
-            Response.failed(StatusConstant.PRODUCT_NOT_FOUND);
+        ProductDetailVo productDetailVo;
+        // 构造商品Vo的key
+        String realKey = CacheKeyUtil.md5Key(new CacheKey(KeyPrefixFactory.productKeyPrefix(KeyPrefixFactory.ProductKey.GET_PRODUCT),
+                CacheKeyUtil.queryParam(productId.toString())));
+
+        if (redisStringService.exists(realKey)){
+            // 从缓存中获得数据
+            String result = redisStringService.get(realKey);
+            productDetailVo = JsonUtil.str2Obj(result, ProductDetailVo.class);
+        }else {
+            Product product = productDao.selectById(productId);
+            if (product == null){
+                Response.failed(StatusConstant.PRODUCT_NOT_FOUND);
+            }
+            // 从数据库中获得数据
+            productDetailVo = getProductDetailVo(product);
+            // 将数据写入缓存中
+            redisStringService.set(realKey, BusinessConstant.RedisCacheExtime.REDIS_CACHE_EXTIME, JsonUtil.obj2Str(productDetailVo));
         }
-        ProductDetailVo productDetailVo = getProductDetailVo(product);
+
         return  Response.success(StatusConstant.GENERAL_SUCCESS, productDetailVo);
     }
 
@@ -206,7 +237,19 @@ public class ProductServiceImpl implements ProductService{
         return productDetailVo;
     }
 
+    /**
+     *  对应的是单个商品
+     *  删除商品, 需要更新缓存列表和对应的缓存文件
+     * @param id
+     * @return
+     */
     public Integer deleteProduct(Integer id) {
+        // 构造商品的key
+        String realKey = CacheKeyUtil.md5Key(new CacheKey(KeyPrefixFactory.productKeyPrefix(KeyPrefixFactory.ProductKey.GET_PRODUCT),
+                CacheKeyUtil.queryParam(id.toString())));
+        if (redisStringService.exists(realKey)){
+            redisStringService.delete(realKey);
+        }
         return productDao.delete(id);
     }
 
@@ -219,13 +262,7 @@ public class ProductServiceImpl implements ProductService{
         if (productId == null){
             throw new GlobalException(StatusConstant.PRAM_BIND_ERROR);
         }
-        Product product = productDao.selectById(productId);
-        if (product == null){
-            Response.failed(StatusConstant.PRODUCT_NOT_FOUND);
-        }
-        if (product.getStatus() != BusinessConstant.ProductStatusEnum.ON_SALE.getCode()){
-            Response.failed(StatusConstant.PRODUCT_NOT_FOUND);
-        }
+
         ProductDetailVo productDetailVo;
         // 构造商品Vo的key
         String params = CacheKeyUtil.queryParam(productId.toString());
@@ -236,6 +273,13 @@ public class ProductServiceImpl implements ProductService{
             productDetailVo = JsonUtil.str2Obj(result, ProductDetailVo.class);
         }else {
             // 从数据库中获得数据
+            Product product = productDao.selectById(productId);
+            if (product == null){
+                Response.failed(StatusConstant.PRODUCT_NOT_FOUND);
+            }
+            if (product.getStatus() != BusinessConstant.ProductStatusEnum.ON_SALE.getCode()){
+                Response.failed(StatusConstant.PRODUCT_NOT_FOUND);
+            }
             productDetailVo = getProductDetailVo(product);
             // 将数据写入缓存中
             redisStringService.set(realKey, BusinessConstant.RedisCacheExtime.REDIS_CACHE_EXTIME, JsonUtil.obj2Str(productDetailVo));
