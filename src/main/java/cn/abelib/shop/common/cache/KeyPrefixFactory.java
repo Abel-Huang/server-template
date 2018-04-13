@@ -26,8 +26,15 @@ public class KeyPrefixFactory {
         return new BaseKeyPrefix(keyPrefix, Shipping.class);
     }
 
+    // 商品部分
     public static BaseKeyPrefix productKeyPrefix(String keyPrefix){
         return new BaseKeyPrefix(keyPrefix, Product.class);
+    }
+
+    public interface ProductKey{
+        String LIST_PRODUCT = "list";
+        String GET_PRODUCT = "get";
+        String GET_PRODUCTS = "gets";
     }
 
     public static BaseKeyPrefix paymentKeyPrefix(String keyPrefix){

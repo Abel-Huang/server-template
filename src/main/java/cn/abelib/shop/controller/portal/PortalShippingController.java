@@ -5,7 +5,7 @@ import cn.abelib.shop.common.constant.StatusConstant;
 import cn.abelib.shop.common.result.Response;
 import cn.abelib.shop.common.tools.CookieUtil;
 import cn.abelib.shop.common.tools.JsonUtil;
-import cn.abelib.shop.dao.redis.RedisStringService;
+import cn.abelib.shop.service.redis.RedisStringService;
 import cn.abelib.shop.pojo.Shipping;
 import cn.abelib.shop.pojo.User;
 import cn.abelib.shop.service.ShippingService;

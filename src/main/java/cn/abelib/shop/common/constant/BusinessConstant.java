@@ -8,8 +8,11 @@ import java.util.Set;
  * Created by abel on 2017/9/6.
  */
 public class BusinessConstant {
-    public static final String CURRENT_USER = "currentUser";
 
+    public interface Search{
+        String PRODUCT_SEARCH_INDEX = "shopping";
+        String PRODUCT_SEARCH_TYPE = "product";
+    }
     public interface RedisCacheExtime{
         Integer REDIS_SESSION_EXTIME = 60 * 30; // unit second
         Integer REDIS_CACHE_EXTIME = 60 * 1; // unit second

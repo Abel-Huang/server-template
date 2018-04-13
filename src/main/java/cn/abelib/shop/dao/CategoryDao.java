@@ -21,6 +21,9 @@ public interface CategoryDao {
     @Select("select id, name, status, sort_order, create_time, update_time from category where id = #{id}")
     Category selectByCategoryId(@Param("id") Integer id);
 
+    @Select("select name from category where id = #{id}")
+    String selectNameByCategoryId(@Param("id") Integer id);
+
     @Select("select * from category where id = #{id}")
     List<Category> getCategoryChildrenByParentId(@Param("id") Integer id);
 }

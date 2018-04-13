@@ -1,7 +1,7 @@
 package cn.abelib.shop.controller.admin;
 
 
-import cn.abelib.shop.dao.redis.RedisStringService;
+import cn.abelib.shop.service.redis.RedisStringService;
 import cn.abelib.shop.common.constant.BusinessConstant;
 import cn.abelib.shop.common.tools.CookieUtil;
 import cn.abelib.shop.common.tools.JsonUtil;

@@ -2,7 +2,7 @@ package cn.abelib.shop.service.impl;
 
 import cn.abelib.shop.common.constant.BusinessConstant;
 import cn.abelib.shop.pojo.User;
-import cn.abelib.shop.dao.redis.RedisStringService;
+import cn.abelib.shop.service.redis.RedisStringService;
 import cn.abelib.shop.common.result.Response;
 import cn.abelib.shop.common.constant.StatusConstant;
 import cn.abelib.shop.common.tools.Md5Util;

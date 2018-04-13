@@ -11,7 +11,7 @@ import cn.abelib.shop.common.tools.CacheKeyUtil;
 import cn.abelib.shop.common.tools.DateUtil;
 import cn.abelib.shop.common.tools.JsonUtil;
 import cn.abelib.shop.common.tools.PropertiesUtil;
-import cn.abelib.shop.dao.redis.RedisStringService;
+import cn.abelib.shop.service.redis.RedisStringService;
 import cn.abelib.shop.pojo.Category;
 import cn.abelib.shop.pojo.Product;
 import cn.abelib.shop.dao.CategoryDao;

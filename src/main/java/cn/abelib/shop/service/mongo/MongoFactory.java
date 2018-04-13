@@ -1,4 +1,4 @@
-package cn.abelib.shop.dao.mongo;
+package cn.abelib.shop.service.mongo;
 
 import cn.abelib.shop.common.constant.StatusConstant;
 import cn.abelib.shop.common.exception.GlobalException;

@@ -1,4 +1,4 @@
-package cn.abelib.shop.dao.mongo;
+package cn.abelib.shop.service.mongo;
 
 /**
  * Created by abel on 2018/2/24.

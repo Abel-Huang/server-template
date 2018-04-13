@@ -1,4 +1,4 @@
-package cn.abelib.shop.dao.redis;
+package cn.abelib.shop.service.redis;
 
 import cn.abelib.shop.common.cache.KeyPrefix;
 import cn.abelib.shop.common.tools.JsonUtil;
