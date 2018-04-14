@@ -5,13 +5,13 @@ package cn.abelib.shop.common.constant;
  *  商品索引的key值常量定义
  */
 public class ProductBusiness {
-    public static final String PRODUCT_ID = "productId";
+    public static final String PRODUCT_ID = "id";
 
     public static final String CATEGPRY_ID = "categoryId";
 
     public static final String PRODUCT_NAME = "name";
 
-    public static final String CATEGPRY_NAME = "categoryName";
+    public static final String CATEGPORY_NAME = "categoryName";
 
     public static final String SUB_TITLE = "subTitle";
 

@@ -28,11 +28,12 @@ public class StatusConstant {
     private static final String NOT_ADMIN_ERRORS = "用户不是管理员";
 
 
-    private static final String ADD_PRODUCT_ERROR = "添加产品失败";
-    private static final String UPDATE_PRODUCT_ERROR = "修改产品失败";
-    private static final String UPDATE_ADD_PRODUCT_ERROR = "新增或修改产品失败";
-    private static final String UPDATE_PRODUCT_STATUS_ERROR = "修改产品销售状态失败";
-    private static final String PRODUCT_NOT_FOUND_ERROR = "产品不存在或者已经下架";
+    private static final String ADD_PRODUCT_ERROR = "添加商品失败";
+    private static final String UPDATE_PRODUCT_ERROR = "修改商品失败";
+    private static final String UPDATE_ADD_PRODUCT_ERROR = "新增或修改商品失败";
+    private static final String UPDATE_PRODUCT_STATUS_ERROR = "修改商品销售状态失败";
+    private static final String PRODUCT_NOT_FOUND_ERROR = "商品不存在或者已经下架";
+    private static final String QUERY_PRODUCT_ERROR = "查找商品失败";
 
     private static final String ADD_SHIPPING_ERROR = "添加收货地址失败";
     private static final String DEL_SHIPPING_ERROR = "删除收货地址失败";
@@ -71,6 +72,7 @@ public class StatusConstant {
     public static Meta UPDATE_ADD_PRODUCT_FAILED = new Meta(500402, UPDATE_ADD_PRODUCT_ERROR);
     public static Meta UPDATE_PRODUCT_STATUS_FAILED = new Meta(500403, UPDATE_PRODUCT_STATUS_ERROR);
     public static Meta PRODUCT_NOT_FOUND = new Meta(500404, PRODUCT_NOT_FOUND_ERROR);
+    public static Meta QUERY_PRODUCT_FAILED = new Meta(500405, QUERY_PRODUCT_ERROR);
 
     //Shipping 5005xx
     public static Meta ADD_SHIPPING_FAILED = new Meta(500500, ADD_SHIPPING_ERROR);

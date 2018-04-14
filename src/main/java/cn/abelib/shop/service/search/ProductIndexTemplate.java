@@ -9,7 +9,7 @@ import java.util.Date;
  */
 
 public class ProductIndexTemplate{
-    private Integer productId;
+    private Integer id;
     private Integer categoryId;
     private String name;
     private String categoryName;
@@ -20,12 +20,12 @@ public class ProductIndexTemplate{
     private Date createTime;
     private Date updateTime;
 
-    public Integer getProductId() {
-        return productId;
+    public Integer getId() {
+        return id;
     }
 
-    public void setProductId(Integer productId) {
-        this.productId = productId;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public Integer getCategoryId() {

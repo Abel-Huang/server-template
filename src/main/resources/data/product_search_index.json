@@ -1,0 +1,53 @@
+
+/**
+  商品搜索的索引结构
+*/
+
+{
+  "settings":{
+    "number_of_replicas": 0
+  },
+  "mappings":{
+    "product":{
+      "dynamic":false,
+      "properties":{
+        "id":{
+          "type" : "integer"
+        },
+        "categoryId":{
+          "type" : "integer"
+        },
+        "name":{
+          "type" : "text",
+          "index" : "analyzed"
+        },
+        "categoryName":{
+          "type" : "text",
+          "index" : "analyzed"
+        },
+        "subTitle":{
+          "type" : "text",
+          "index" : "analyzed"
+        },
+        "detail":{
+          "type" : "text",
+          "index" : "analyzed"
+        },
+        "price":{
+          "type" : "integer"
+        },
+        "stock":{
+          "type" : "integer"
+        },
+        "createTime":{
+          "type" : "integer",
+          "index" : "strict_date_optional_time || epoch_mills"
+        },
+        "updateTime":{
+          "type" : "integer",
+          "index" : "strict_date_optional_time || epoch_mills"
+        }
+      }
+    }
+  }
+}

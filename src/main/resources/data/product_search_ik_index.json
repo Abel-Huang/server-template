@@ -1,0 +1,60 @@
+/**
+* 设置了分词器
+*/
+
+{
+  "settings":{
+    "number_of_replicas": 0
+  },
+  "mappings":{
+    "product":{
+      "dynamic":false,
+      "properties":{
+        "id":{
+          "type" : "integer"
+        },
+        "categoryId":{
+          "type" : "integer"
+        },
+        "name":{
+          "type" : "text",
+          "index" : "analyzed",
+          "analyzer" : "ik_smart",
+          "search_analyzer" : "ik_smart"
+        },
+        "categoryName":{
+          "type" : "text",
+          "index" : "analyzed",
+          "analyzer" : "ik_smart",
+          "search_analyzer" : "ik_smart"
+        },
+        "subTitle":{
+          "type" : "text",
+          "index" : "analyzed",
+          "analyzer" : "ik_smart",
+          "search_analyzer" : "ik_smart"
+        },
+        "detail":{
+          "type" : "text",
+          "index" : "analyzed",
+          "analyzer" : "ik_smart",
+          "search_analyzer" : "ik_smart"
+        },
+        "price":{
+          "type" : "integer"
+        },
+        "stock":{
+          "type" : "integer"
+        },
+        "createTime":{
+          "type" : "integer",
+          "index" : "strict_date_optional_time || epoch_mills"
+        },
+        "updateTime":{
+          "type" : "integer",
+          "index" : "strict_date_optional_time || epoch_mills"
+        }
+      }
+    }
+  }
+}
