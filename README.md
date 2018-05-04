@@ -1,5 +1,6 @@
-# micro-server
-一个电商服务端demo，主要用于技术的学习和实践 
+# micro-server(v2)
+### 项目介绍
+基于dubbo的分布式项目
 
 * Spring/SpringBoot:用于搭建项目整体架构
 * MyBatis:ORM框架
@@ -13,3 +14,6 @@
 * Guava:谷歌开源的Java工具类
 * Tomcat:Servlet应用服务器
 * Jackson:序列化框架
+
+
+
