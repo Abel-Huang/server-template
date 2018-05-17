@@ -19,6 +19,9 @@ import com.google.common.collect.Lists;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -35,6 +38,7 @@ public class CartServiceImpl implements CartService{
     @Autowired
     private ProductDao productDao;
 
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Response<CartVo> add(Integer userId, Integer productId, Integer count){
         if (productId == null || count == null){
             throw new GlobalException(StatusConstant.PRAM_BIND_ERROR);
@@ -56,6 +60,7 @@ public class CartServiceImpl implements CartService{
         }
         return this.list(userId);
     }
+
 
     private CartVo getCartVoLimit(Integer userId){
         CartVo cartVo = new CartVo();
@@ -128,6 +133,7 @@ public class CartServiceImpl implements CartService{
      * @param count
      * @return
      */
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Response<CartVo> update(Integer userId, Integer productId, Integer count){
         if (productId == null || count == null){
             throw new GlobalException(StatusConstant.PRAM_BIND_ERROR);
@@ -146,6 +152,7 @@ public class CartServiceImpl implements CartService{
      * @param productIds
      * @return
      */
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Response<CartVo> delete(Integer userId, String productIds){
         List<String> productList = Splitter.on(",").splitToList(productIds);
         if (CollectionUtils.isEmpty(productList)){
@@ -157,16 +164,19 @@ public class CartServiceImpl implements CartService{
         return this.list(userId);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Response<CartVo> list(Integer userId){
         CartVo cartVo = this.getCartVoLimit(userId);
         return Response.success(StatusConstant.GENERAL_SUCCESS, cartVo);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Response<CartVo> selectOrUnselectAll(Integer userId, Integer checked){
         cartDao.selectOrUnselectAll(userId);
         return this.list(userId);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Response<CartVo> selectOrUnselect(Integer userId, Integer productId, Integer checked){
         cartDao.selectOrUnselect(userId, productId);
         return this.list(userId);
@@ -177,6 +187,7 @@ public class CartServiceImpl implements CartService{
      * @param userId
      * @return
      */
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Response<Integer> getCartProductCount(Integer userId){
         if (userId == null){
             throw new GlobalException(StatusConstant.PRAM_BIND_ERROR);

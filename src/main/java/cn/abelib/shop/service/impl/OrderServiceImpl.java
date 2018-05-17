@@ -21,6 +21,9 @@ import com.google.common.collect.Lists;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -54,6 +57,7 @@ public class OrderServiceImpl implements OrderService{
      * @param shippingId
      * @return
      */
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Response<OrderVo> createOrder(Integer userId, Integer shippingId){
         List<Cart> cartList = cartDao.selectCheckedCartByUserId(userId);
 
@@ -275,6 +279,7 @@ public class OrderServiceImpl implements OrderService{
      * @param orderNo
      * @return
      */
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Response cancelOrder(Integer userId, Long orderNo){
         Orders order = orderDao.selectByOrderNoAndId(userId, orderNo);
         if (order == null){
@@ -298,6 +303,7 @@ public class OrderServiceImpl implements OrderService{
      * @param userId
      * @return
      */
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Response<OrderProductVo> getOrderCartProduct(Integer userId){
         OrderProductVo orderProductVo = new OrderProductVo();
 
@@ -317,6 +323,7 @@ public class OrderServiceImpl implements OrderService{
         return Response.success(StatusConstant.GENERAL_SUCCESS, orderProductVo);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Response<OrderVo> getOrderDetail(Integer userId, Long orderNo) {
         Orders order = orderDao.selectByOrderNoAndId(userId, orderNo);
         if (order != null) {
@@ -334,6 +341,7 @@ public class OrderServiceImpl implements OrderService{
      * @param pageSize
      * @return
      */
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Response<PageInfo> getOrderList(Integer userId, Integer pageNum, Integer pageSize){
         PageHelper.startPage(pageNum, pageSize);
         List<Orders> ordersList = orderDao.selectByUserId(userId);
@@ -366,6 +374,7 @@ public class OrderServiceImpl implements OrderService{
      * @param pageSize
      * @return
      */
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Response<PageInfo> getOrderList(Integer pageNum, Integer pageSize){
         PageHelper.startPage(pageNum, pageSize);
         List<Orders> ordersList = orderDao.listOrder();
@@ -381,6 +390,7 @@ public class OrderServiceImpl implements OrderService{
      * @param orderNo
      * @return
      */
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Response<OrderVo> getOrderDetail(Long orderNo) {
         Orders order = orderDao.selectByOrderNo(orderNo);
         if (order != null) {
@@ -391,6 +401,7 @@ public class OrderServiceImpl implements OrderService{
         return Response.failed(StatusConstant.ORDER_NOT_FOUND_FAILED);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Response<PageInfo> orderSearch(Long orderNo, Integer pageNum, Integer pageSize) {
         PageHelper.startPage(pageNum, pageSize);
         Orders order = orderDao.selectByOrderNo(orderNo);
@@ -404,6 +415,7 @@ public class OrderServiceImpl implements OrderService{
         return Response.failed(StatusConstant.ORDER_NOT_FOUND_FAILED);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Response sendGoods(Long orderNo){
         Orders order = orderDao.selectByOrderNo(orderNo);
         if (order != null) {

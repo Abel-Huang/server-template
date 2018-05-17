@@ -11,6 +11,9 @@ import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -21,6 +24,7 @@ import java.util.Map;
  *  收货地址服务接口
  */
 @Service
+@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
 public class ShippingServiceImpl implements ShippingService{
     @Autowired
     private ShippingDao shippingDao;

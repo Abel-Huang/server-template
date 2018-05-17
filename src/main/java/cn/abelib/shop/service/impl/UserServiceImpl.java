@@ -11,12 +11,16 @@ import cn.abelib.shop.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 
 /**
  * Created by abel on 2018/2/5.
  */
 @Service
+@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
 public class UserServiceImpl implements UserService {
     // cookie name
     public static final String COOKIE_NAME_TOKEN = "token";

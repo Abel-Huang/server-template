@@ -15,6 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
@@ -36,6 +39,7 @@ public class CategoryServiceImpl implements CategoryService{
      * @param parentId
      * @return
      */
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Response<String> addCategory(String categoryName, Integer parentId) {
         if (parentId == null || StringUtils.isBlank(categoryName)){
             throw new GlobalException(StatusConstant.PRAM_BIND_ERROR);
@@ -58,6 +62,7 @@ public class CategoryServiceImpl implements CategoryService{
      * @param categoryName
      * @return
      */
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Response<String> updateCategoryByName(Integer categoryId, String categoryName) {
         if (categoryId == null || StringUtils.isBlank(categoryName)){
             throw new GlobalException(StatusConstant.PRAM_BIND_ERROR);
@@ -78,6 +83,7 @@ public class CategoryServiceImpl implements CategoryService{
      * @param categoryId
      * @return
      */
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Response<List<Category>>  getChildrenParallelCategory(Integer categoryId){
         List<Category> categoryList = categoryDao.getCategoryChildrenByParentId(categoryId);
         if (CollectionUtils.isEmpty(categoryList)){
@@ -91,6 +97,7 @@ public class CategoryServiceImpl implements CategoryService{
      * @param categoryId
      * @return
      */
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Response<List<Integer>>  getCategoryAndChildrenById(Integer categoryId) {
         Set<Category> categorySet = Sets.newHashSet();
         getChildrenCategory(categorySet, categoryId);
@@ -122,6 +129,7 @@ public class CategoryServiceImpl implements CategoryService{
         return categorySet;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Category getCategoryById(Integer id) {
         return categoryDao.selectByCategoryId(id);
     }

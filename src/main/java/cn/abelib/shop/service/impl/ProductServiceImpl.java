@@ -28,6 +28,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -54,6 +57,7 @@ public class ProductServiceImpl implements ProductService{
      * @param pageSize
      * @return
      */
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Response<PageInfo> listProduct(Integer pageNum, Integer pageSize) {
         PageHelper.startPage(pageNum, pageSize);
         List<ProductListVo> productListVoList;
@@ -98,6 +102,7 @@ public class ProductServiceImpl implements ProductService{
         return productListVo;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Response<PageInfo> productSearch(String productName, Integer productId, Integer pageNum, Integer pageSize) {
         PageHelper.startPage(pageNum, pageSize);
         if (StringUtils.isNotBlank(productName)){
@@ -119,6 +124,7 @@ public class ProductServiceImpl implements ProductService{
      * @param product
      * @return
      */
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Response<String> saveOrUpdateProduct(Product product) {
        if (product != null){
            if (StringUtils.isNotBlank(product.getMainImage())){
@@ -158,6 +164,7 @@ public class ProductServiceImpl implements ProductService{
      * @param status
      * @return
      */
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Response<String> setSalesStatus(Integer productId, Integer status) {
         if (productId == null || status == null){
             throw new GlobalException(StatusConstant.PRAM_BIND_ERROR);
@@ -183,6 +190,7 @@ public class ProductServiceImpl implements ProductService{
      * @param productId
      * @return
      */
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Response<ProductDetailVo> getProductDetail(Integer productId){
         if (productId == null){
             throw new GlobalException(StatusConstant.PRAM_BIND_ERROR);
@@ -243,6 +251,7 @@ public class ProductServiceImpl implements ProductService{
      * @param id
      * @return
      */
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Integer deleteProduct(Integer id) {
         // 构造商品的key
         String realKey = CacheKeyUtil.md5Key(new CacheKey(KeyPrefixFactory.productKeyPrefix(KeyPrefixFactory.ProductKey.GET_PRODUCT),
@@ -258,6 +267,7 @@ public class ProductServiceImpl implements ProductService{
      * @param productId
      * @return
      */
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Response<ProductDetailVo> getProductDetailPortal(Integer productId){
         if (productId == null){
             throw new GlobalException(StatusConstant.PRAM_BIND_ERROR);
@@ -297,6 +307,7 @@ public class ProductServiceImpl implements ProductService{
      * @param orderBy
      * @return
      */
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Response<PageInfo> getProductByKeywordOrCategory(String keyword, Integer categoryId, Integer pageNum, Integer pageSize, String orderBy){
         if (categoryId == null && StringUtils.isBlank(keyword)){
             throw new GlobalException(StatusConstant.PRAM_BIND_ERROR);

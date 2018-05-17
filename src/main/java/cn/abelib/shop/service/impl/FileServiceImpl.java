@@ -13,6 +13,9 @@ import cn.abelib.shop.vo.FileVo;
 import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
@@ -30,6 +33,7 @@ public class FileServiceImpl implements FileService{
     private MongoService mongoService;
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Response<FileVo> upload(MultipartFile file) {
         File saveFile = new File();
         try {
